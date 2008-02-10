@@ -16,6 +16,13 @@
 
   ASDF system definition is included in curly.asd file.
 
+  Latest stable version of Curly can be obtained as a .tar.gz archive
+  at [[http://www.pasternacki.net/files/curly.tar.gz]];  current
+  development version (recommended) is available as [[http://darcs.net/][Darcs]] repository
+  at [[http://www.pasternacki.net/repos/curly]]:
+
+  :darcs get http://www.pasternacki.net/repos/curly
+
 ** Square bracket macro
    Square bracket macro does simple currying:
 
