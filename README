@@ -3,7 +3,7 @@
 #+TITLE: Curly
 #+AUTHOR: Maciej Pasternacki
 #+EMAIL: maciekp@japhy.fnord.org
-#+TEXT: Reader macros for easy function currying and composition.
+#+TEXT: Common Lisp reader macros for easy function currying and composition.
 #+OPTIONS: *:nil
 
 * Description
@@ -79,19 +79,26 @@
    :(LAMBDA (#:G2725) (FOO (BAR 16 (BAZ (QUUX #:G2725) 23 42)))
 
 * Reference
-  All Curly functions and variables are exported from package CURLY.
+  All Curly functions, macros and variables are exported from package
+  CURLY.
+
 ** *BLANK-ARGUMENT*
    Variable: specifies symbol that is used to indicate blank argument
    for currying.  Default value is '*.
+
 ** CURLY-READER stream character
    Function: reader macro function for curly braces (composition).
+
 ** SQUARE-READER stream character
    Function: reader macro function for square braces (currying).
+
 ** MAKE-CURLY-READTABLE &optional (original-readtable *readtable*)
    Function: returns modified copy of ORIGINAL-READTABLE that has
    Curly reader macros turned on.
+
 ** ENABLE-CURLY-SYNTAX
    Macro: enable curly syntax for current file.
+
 ** DISABLE-CURLY-SYNTAX
    Macro: disable curly syntax for current file.
 
