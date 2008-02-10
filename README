@@ -1,0 +1,103 @@
+-*- org -*-
+
+#+TITLE: Curly
+#+AUTHOR: Maciej Pasternacki
+#+EMAIL: maciekp@japhy.fnord.org
+#+TEXT: Reader macros for easy function currying and composition.
+#+OPTIONS: *:nil
+
+* Description
+  Curly is set of two reader macros for easy function currying and
+  composition.  It was inspired by [[http://www.paulgraham.com/arc.html][Arc]]'s syntax for currying, using
+  square brackets.  Curly creates anonymous functions (lambdas) with
+  literal function composition instead of trying smarter approach
+  (like using (REDUCE #'FUNCALL ...)) so that the compiler is able to
+  do more optimizations.
+
+  ASDF system definition is included in curly.asd file.
+
+** Square bracket macro
+   Square bracket macro does simple currying:
+
+   :CURLY> '[foo]
+   :(LAMBDA (#:G2705) (FOO #:G2705))
+   :CURLY> '[foo bar]
+   :(LAMBDA (#:G2706) (FOO BAR #:G2706))
+   :CURLY> '[foo bar baz]
+   :(LAMBDA (#:G2707) (FOO BAR BAZ #:G2707))
+
+   By using symbol configured by CURLY:*BLANK-ARGUMENT* user can put
+   anonymous function's parameter in desired place, not necessarily at
+   end of argument list.  By default, blank argument is a single star,
+   but it can be set e.g. to underscore to better match Arc:
+
+   :CURLY> '[foo bar * baz]
+   :(LAMBDA (#:G2709) (FOO BAR #:G2709 BAZ))
+   :CURLY> '[foo * bar baz]
+   :(LAMBDA (#:G2710) (FOO #:G2710 BAR BAZ))
+
+   Curly interpretes blank argument only in argument position; blank
+   argument in functional position is left untouched:
+
+   :CURLY> '[* foo bar baz]
+   :(LAMBDA (#:G2711) (* FOO BAR BAZ #:G2711))
+   :CURLY> '[* foo * baz]
+   :(LAMBDA (#:G2712) (* FOO #:G2712 BAZ))
+
+** Curly bracket macro
+   Curly bracket does function composition, which may be coupled with
+   currying.  Let's start from simple composition:
+
+   :CURLY> '{foo bar}
+   :(LAMBDA (#:G2714) (FOO (BAR #:G2714)))
+   :CURLY> '{foo bar baz}
+   :(LAMBDA (#:G2715) (FOO (BAR (BAZ #:G2715))))
+   :CURLY> '{foo bar baz quux}
+   :(LAMBDA (#:G2716) (FOO (BAR (BAZ (QUUX #:G2716)))))
+
+   And so on, and so on.  When instead of a function name there is a
+   list within the braces, this means currying:
+
+   :CURLY> '{foo (bar 23) baz quux}
+   :(LAMBDA (#:G2721) (FOO (BAR 23 (BAZ (QUUX #:G2721)))))
+   :CURLY> '{foo (bar 16) (baz 23 42) quux}
+   :(LAMBDA (#:G2723) (FOO (BAR 16 (BAZ 23 42 (QUUX #:G2723)))))
+
+   Of course, when currying within braces, blank argument can be used
+   as well:
+
+   :CURLY> '{foo (bar 16) (baz 23 * 42) quux}
+   :(LAMBDA (#:G2724) (FOO (BAR 16 (BAZ 23 (QUUX #:G2724) 42))))
+   :CURLY> '{foo (bar 16) (baz * 23 42) quux}
+   :(LAMBDA (#:G2725) (FOO (BAR 16 (BAZ (QUUX #:G2725) 23 42)))
+
+* Reference
+  All Curly functions and variables are exported from package CURLY.
+** *BLANK-ARGUMENT*
+   Variable: specifies symbol that is used to indicate blank argument
+   for currying.  Default value is '*.
+** CURLY-READER stream character
+   Function: reader macro function for curly braces (composition).
+** SQUARE-READER stream character
+   Function: reader macro function for square braces (currying).
+** MAKE-CURLY-READTABLE &optional (original-readtable *readtable*)
+   Function: returns modified copy of ORIGINAL-READTABLE that has
+   Curly reader macros turned on.
+** ENABLE-CURLY-SYNTAX
+   Macro: enable curly syntax for current file.
+** DISABLE-CURLY-SYNTAX
+   Macro: disable curly syntax for current file.
+
+   Warning: Calling DISABLE-CURLY-SYNTAX when curly syntax is not
+   enabled can give funny results.  Also, reading multiple files using
+   ENABLE-CURLY-SYNTAX and DISABLE-CURLY-SYNTAX in different threads
+   can invoke a disaster.  ENABLE-CURLY-SYNTAX itself is safe.
+
+* Testing
+  Unit tests are included in tests.lisp file.  To run test, you need
+  FiveAM testing framework along with required Arnesi library from
+  [[http://common-lisp.net/project/bese/]].
+
+  To run the tests, simply load curly with ASDF, and then type into
+  REPL:
+  : (asdf:operate 'asdf:test-op :curly)
