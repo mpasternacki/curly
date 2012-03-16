@@ -2,7 +2,7 @@
 
 #+TITLE: Curly
 #+AUTHOR: Maciej Pasternacki
-#+EMAIL: maciekp@japhy.fnord.org
+#+EMAIL: maciej@pasternacki.net
 #+TEXT: Common Lisp reader macros for easy function currying and composition.
 #+OPTIONS: *:nil
 
